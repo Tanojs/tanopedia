@@ -93,23 +93,54 @@ export default function Home() {
               onMouseLeave={startAutoPlay}
             >
               <div className="flex transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+                            {/* CAROUSEL BANNER - Mengikuti Desain Gambar 353f0bab-7c5a-4f19-8ab0-82b5323cdb5c */}
+            <div 
+              className="relative w-full rounded-[24px] overflow-hidden mt-2 bg-[#1a1a2e] shadow-[0_8px_30px_rgba(108,60,225,0.15)] border border-white/5"
+              onMouseEnter={stopAutoPlay}
+              onMouseLeave={startAutoPlay}
+            >
+              <div className="flex transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
                 {BANNERS.map((banner, index) => (
-                  // Ubah aspek rasio di sini menjadi aspect-[16/9]
-                  <div key={index} className="min-w-full relative aspect-[16/9] shrink-0 overflow-hidden">
+                  <div key={index} className="min-w-full relative aspect-[16/10.5] shrink-0 overflow-hidden">
+                    {/* Gambar Background Banner */}
                     <img src={banner.img} alt={banner.title} className="w-full h-full object-cover pointer-events-none" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-5 text-white">
-                      <span className="self-start text-[9px] font-bold tracking-[0.8px] bg-[#f59e0b] text-[#1a1a2e] px-3 py-[2px] rounded-full mb-1">{banner.tag}</span>
-                      <h3 className="text-[20px] font-bold mb-[2px] drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">{banner.title}</h3>
-                      <p className="text-[13px] opacity-90 font-medium drop-shadow-[0_1px_4px_rgba(0,0,0,0.3)]">{banner.desc}</p>
+                    
+                    {/* Overlay Gelap & Penataan Teks Kiri */}
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex flex-col justify-center p-6 text-white">
+                      
+                      {/* Tag Kategori Atas dengan Ikon Petir */}
+                      <span className="self-start text-[10px] font-bold tracking-[0.5px] bg-[#00bfa5]/10 text-[#00e676] border border-[#00bfa5]/30 px-3 py-[3px] rounded-lg mb-2.5 flex items-center gap-1 uppercase">
+                        <i className="fas fa-bolt text-[9px]"></i> {banner.tag}
+                      </span>
+                      
+                      {/* Judul Utama Miring (Italic Bold) */}
+                      <h3 className="text-[26px] font-black italic tracking-tight mb-1 bg-gradient-to-r from-white via-white to-gray-350 bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+                        {banner.title}
+                      </h3>
+                      
+                      {/* Deskripsi Teks */}
+                      <p className="text-[12px] opacity-80 font-medium max-w-[75%] leading-relaxed mb-5 drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
+                        {banner.desc}
+                      </p>
+
+                      {/* Tombol LIHAT > */}
+                      <button className="self-start bg-gradient-to-r from-[#00bfa5] to-[#00e676] text-[#1a1a2e] font-extrabold text-[12px] tracking-wide px-5 py-2 rounded-xl shadow-[0_4px_15px_rgba(0,191,165,0.4)] active:scale-95 transition-all flex items-center gap-2 border-none cursor-pointer">
+                        LIHAT <i className="fas fa-chevron-right text-[10px]"></i>
+                      </button>
+
                     </div>
                   </div>
                 ))}
               </div>
               
-              {/* Dots tetap di bawah */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+              {/* INDIKATOR DOTS KAPSUL (Capsule Glow Slider) */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
                 {BANNERS.map((_, idx) => (
-                  <button key={idx} onClick={() => setCurrentSlide(idx)} className={`w-2 h-2 rounded-full transition-all border-none p-0 cursor-pointer ${idx === currentSlide ? 'bg-white scale-125 shadow-[0_0_8px_rgba(255,255,255,0.4)]' : 'bg-white/50'}`} />
+                  <button 
+                    key={idx} 
+                    onClick={() => setCurrentSlide(idx)} 
+                    className={`transition-all duration-300 border-none p-0 cursor-pointer h-[6px] rounded-full ${idx === currentSlide ? 'w-[22px] bg-[#00e676] shadow-[0_0_10px_rgba(0,230,118,0.6)]' : 'w-[6px] bg-white/40'}`} 
+                  />
                 ))}
               </div>
             </div>
