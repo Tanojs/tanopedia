@@ -86,30 +86,35 @@ export default function Home() {
             </p>
           </header>
 
-          {/* CAROUSEL BANNER */}
-          <div 
-            className="relative w-full rounded-[20px] overflow-hidden mt-2 bg-[#1a1a2e] shadow-[0_8px_28px_rgba(108,60,225,0.1)]"
-            onMouseEnter={stopAutoPlay}
-            onMouseLeave={startAutoPlay}
-          >
-            <div className="flex transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-              {BANNERS.map((banner, index) => (
-                <div key={index} className="min-w-full relative aspect-[10/4.2] shrink-0 overflow-hidden">
-                  <img src={banner.img} alt={banner.title} className="w-full h-full object-cover pointer-events-none" />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-4 md:p-5 text-white">
-                    <span className="self-start text-[9px] font-bold tracking-[0.8px] bg-[#f59e0b] text-[#1a1a2e] px-3 py-[2px] rounded-full mb-1">{banner.tag}</span>
-                    <h3 className="text-[18px] font-bold mb-[2px] drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">{banner.title}</h3>
-                    <p className="text-[12px] opacity-90 font-medium drop-shadow-[0_1px_4px_rgba(0,0,0,0.3)]">{banner.desc}</p>
+                      {/* CAROUSEL BANNER - Sekarang Persegi Panjang Proporsional */}
+            <div 
+              className="relative w-full rounded-[20px] overflow-hidden mt-2 bg-[#1a1a2e] shadow-[0_8px_28px_rgba(108,60,225,0.1)]"
+              onMouseEnter={stopAutoPlay}
+              onMouseLeave={startAutoPlay}
+            >
+              <div className="flex transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+                {BANNERS.map((banner, index) => (
+                  // Ubah aspek rasio di sini menjadi aspect-[16/9]
+                  <div key={index} className="min-w-full relative aspect-[16/9] shrink-0 overflow-hidden">
+                    <img src={banner.img} alt={banner.title} className="w-full h-full object-cover pointer-events-none" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/20 to-transparent flex flex-col justify-end p-5 text-white">
+                      <span className="self-start text-[9px] font-bold tracking-[0.8px] bg-[#f59e0b] text-[#1a1a2e] px-3 py-[2px] rounded-full mb-1">{banner.tag}</span>
+                      <h3 className="text-[20px] font-bold mb-[2px] drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">{banner.title}</h3>
+                      <p className="text-[13px] opacity-90 font-medium drop-shadow-[0_1px_4px_rgba(0,0,0,0.3)]">{banner.desc}</p>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
+              
+              {/* Dots tetap di bawah */}
+              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex gap-2 z-10">
+                {BANNERS.map((_, idx) => (
+                  <button key={idx} onClick={() => setCurrentSlide(idx)} className={`w-2 h-2 rounded-full transition-all border-none p-0 cursor-pointer ${idx === currentSlide ? 'bg-white scale-125 shadow-[0_0_8px_rgba(255,255,255,0.4)]' : 'bg-white/50'}`} />
+                ))}
+              </div>
             </div>
-            <div className="absolute bottom-3 left-1/2 -translate-x-1/2 flex gap-2 z-10">
-              {BANNERS.map((_, idx) => (
-                <button key={idx} onClick={() => setCurrentSlide(idx)} className={`w-2 h-2 rounded-full transition-all border-none p-0 cursor-pointer ${idx === currentSlide ? 'bg-white scale-125 shadow-[0_0_8px_rgba(255,255,255,0.4)]' : 'bg-white/50'}`} />
-              ))}
-            </div>
-          </div>
+
+          
 
           {/* SEARCH & INVOICE */}
           <div className="bg-white rounded-[20px] p-[16px_18px] mt-3.5 shadow-[0_8px_28px_rgba(108,60,225,0.1)] border border-[#6c3ce1]/5 flex flex-col gap-3">
