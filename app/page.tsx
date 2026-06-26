@@ -284,4 +284,24 @@ export default function Home() {
       )}
 
       {/* ====== BOTTOM NAVIGATION TABS ====== */}
-      <nav
+      <nav className="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto bg-white/88 backdrop-blur-[16px] border-t border-[#6c3ce1]/6 flex justify-around items-center h-[70px] pb-2 shadow-[0_-4px_20px_rgba(108,60,225,0.06)] z-[100] rounded-t-[24px]">
+        <button onClick={() => setActivePage('home')} className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-2xl min-w-[64px] relative active:scale-[0.92] transition-all cursor-pointer ${activePage === 'home' ? 'text-[#6C3CE1] font-bold' : 'text-[#8a8aa8]'}`}>
+          <i className="fas fa-home text-[22px] transition-all"></i>
+          <span className="text-[10px] font-semibold transition-all">Home</span>
+          {activePage === 'home' && <div className="absolute top-[-1px] left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-full bg-gradient-to-r from-[#6C3CE1] to-[#a855f7]" />}
+        </button>
+        <button onClick={() => { setActivePage('history'); triggerToast('Menampilkan riwayat transaksi', 'fa-clock-rotate-left'); }} className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-2xl min-w-[64px] relative active:scale-[0.92] transition-all cursor-pointer ${activePage === 'history' ? 'text-[#6C3CE1] font-bold' : 'text-[#8a8aa8]'}`}>
+          <i className="fas fa-clock-rotate-left text-[22px] transition-all"></i>
+          <span className="text-[10px] font-semibold transition-all">History</span>
+          {activePage === 'history' && <div className="absolute top-[-1px] left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-full bg-gradient-to-r from-[#6C3CE1] to-[#a855f7]" />}
+        </button>
+        <button onClick={() => { setActivePage('profile'); triggerToast('Profil Anda', 'fa-user'); }} className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-2xl min-w-[64px] relative active:scale-[0.92] transition-all cursor-pointer ${activePage === 'profile' ? 'text-[#6C3CE1] font-bold' : 'text-[#8a8aa8]'}`}>
+          <i className="fas fa-user text-[22px] transition-all"></i>
+          <span className="text-[10px] font-semibold transition-all">Profile</span>
+          {activePage === 'profile' && <div className="absolute top-[-1px] left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-full bg-gradient-to-r from-[#6C3CE1] to-[#a855f7]" />}
+        </button>
+      </nav>
+
+    </div>
+  );
+}
