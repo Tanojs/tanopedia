@@ -1,6 +1,7 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
+import useEmblaCarousel from 'embla-carousel-react';
 import { Product } from './types';
 
 // 1. DATA PRODUK TOKO
@@ -11,11 +12,26 @@ const DATA_PRODUCTS: Product[] = [
   { id: '4', name: 'Netflix Premium', category: 'stream', desc: 'Ultra HD · 4K', price: 69900, originalPrice: 120000, image: 'https://picsum.photos/seed/netflix/400/200', isHot: true, icon: 'fa-film' },
 ];
 
-// 2. DATA BANNER PROMO (Bisa kamu sesuaikan teksnya sesuka hati)
-const BANNERS = [
-  { tag: 'SOURCE CODE', title: 'SC BOT', desc: 'Source code premium dengan fitur lengkap, ringan, aman, dan mudah digunakan.', img: 'https://picsum.photos/seed/banner1/1200/800' },
-  { tag: 'FLASH SALE', title: 'DISKON 50%', desc: 'Akses instan aplikasi premium tanpa batas untuk kebutuhan harianmu.', img: 'https://picsum.photos/seed/banner2/1200/800' },
-  { tag: 'DISTRIBUTOR', title: 'HARGA TERMURAH', desc: 'Layanan otomatis 24 jam dengan garansi penuh selama 30 hari kalender.', img: 'https://picsum.photos/seed/banner3/1200/800' },
+// 2. DATA BANNER EMBLA (Disesuaikan ke Tema Ungu Premium Tano Pedia)
+const SLIDES = [
+  {
+    category: "SOURCE CODE",
+    title: <>SC <span className="text-[#00e676]">BOT PREMIUM</span></>,
+    desc: "Source code premium dengan fitur lengkap, ringan, aman, dan mudah digunakan untuk kebutuhan server harianmu.",
+    bg: "https://picsum.photos/seed/banner1/1200/800"
+  },
+  {
+    category: "FLASH SALE",
+    title: <>DISKON <span className="text-[#00e676]">50% OFF</span></>,
+    desc: "Akses instan aplikasi premium tanpa batas dengan harga distributor termurah khusus minggu ini.",
+    bg: "https://picsum.photos/seed/banner2/1200/800"
+  },
+  {
+    category: "DISTRIBUTOR",
+    title: <>GARANSI <span className="text-[#00e676]">30 HARI</span></>,
+    desc: "Layanan otomatis 24 jam nonstop dengan perlindungan garansi penuh selama satu bulan kalender.",
+    bg: "https://picsum.photos/seed/banner3/1200/800"
+  }
 ];
 
 export default function Home() {
@@ -26,34 +42,44 @@ export default function Home() {
   const [invoice, setInvoice] = useState('');
   const [toast, setToast] = useState({ show: false, msg: '', icon: 'fa-check-circle' });
   
-  // Slider Carousel State
-  const [currentSlide, setCurrentSlide] = useState(0);
-  const carouselInterval = useRef<NodeJS.Timeout | null>(null);
+  // ---- EMBLA CAROUSEL ENGINE ----
+  const [selectedIndex, setSelectedIndex] = useState(0);
+  const [emblaRef, emblaApi] = useEmblaCarousel({ 
+    loop: true, 
+    duration: 45 
+  });
 
-  // ---- TOAST NOTIFICATION LOGIC ----
+  const onSelect = useCallback(() => {
+    if (!emblaApi) return;
+    setSelectedIndex(emblaApi.selectedScrollSnap());
+  }, [emblaApi]);
+
+  const scrollTo = useCallback((index: number) => {
+    if (emblaApi) emblaApi.scrollTo(index);
+  }, [emblaApi]);
+
+  useEffect(() => {
+    if (!emblaApi) return;
+    onSelect();
+    emblaApi.on("select", onSelect);
+    
+    const intervalId = setInterval(() => {
+      emblaApi.scrollNext();
+    }, 5000);
+
+    return () => {
+      clearInterval(intervalId);
+      emblaApi.off("select", onSelect);
+    };
+  }, [emblaApi, onSelect]);
+
+  // ---- TOAST LOGIC ----
   const triggerToast = (msg: string, icon: string = 'fa-check-circle') => {
     setToast({ show: true, msg, icon });
     setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 2800);
   };
 
-  // ---- AUTOMATIC CAROUSEL SLIDER ----
-  const startAutoPlay = () => {
-    stopAutoPlay();
-    carouselInterval.current = setInterval(() => {
-      setCurrentSlide((prev) => (prev + 1) % BANNERS.length);
-    }, 4000);
-  };
-
-  const stopAutoPlay = () => {
-    if (carouselInterval.current) clearInterval(carouselInterval.current);
-  };
-
-  useEffect(() => {
-    startAutoPlay();
-    return () => stopAutoPlay();
-  }, [currentSlide]);
-
-  // ---- REAL-TIME SEARCH & FILTER FILTERING ----
+  // ---- FILTER REAL-TIME ----
   const filteredProducts = DATA_PRODUCTS.filter((p) => {
     const matchCategory = category === 'all' || p.category === category;
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase().trim());
@@ -93,55 +119,82 @@ export default function Home() {
             </p>
           </header>
 
-          {/* ====== CAROUSEL BANNER PREMIUM (GAYA GLOING CYBERPUNK) ====== */}
-          <div 
-            className="relative w-full rounded-[24px] overflow-hidden mt-2 bg-[#1a1a2e] shadow-[0_8px_30px_rgba(108,60,225,0.15)] border border-white/5"
-            onMouseEnter={stopAutoPlay}
-            onMouseLeave={startAutoPlay}
-          >
-            <div className="flex transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-              {BANNERS.map((banner, index) => (
-                <div key={index} className="min-w-full relative aspect-[16/10.5] shrink-0 overflow-hidden">
-                  {/* Gambar Latar Belakang */}
-                  <img src={banner.img} alt={banner.title} className="w-full h-full object-cover pointer-events-none" />
-                  
-                  {/* Gradasi Overlay Gelap & Penataan Konten */}
-                  <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent flex flex-col justify-center p-6 text-white">
-                    
-                    {/* Badge Indikator Atas dengan Ikon Petir */}
-                    <span className="self-start text-[10px] font-bold tracking-[0.5px] bg-[#00bfa5]/10 text-[#00e676] border border-[#00bfa5]/30 px-3 py-[3px] rounded-lg mb-2.5 flex items-center gap-1 uppercase">
-                      <i className="fas fa-bolt text-[9px]"></i> {banner.tag}
-                    </span>
-                    
-                    {/* Judul Cetak Miring Tebal (Italic Black) */}
-                    <h3 className="text-[26px] font-black italic tracking-tight mb-1 bg-gradient-to-r from-white via-white to-gray-300 bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-                      {banner.title}
-                    </h3>
-                    
-                    {/* Teks Sub-deskripsi */}
-                    <p className="text-[12px] opacity-80 font-medium max-w-[75%] leading-relaxed mb-5 drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
-                      {banner.desc}
-                    </p>
+          {/* ====== SEKSI EMBLA CAROUSEL HERO (FLUID & SMOOTH ANIMATION) ====== */}
+          <div className="relative w-full rounded-[24px] overflow-hidden mt-2 bg-[#1a1a2e] shadow-[0_8px_30px_rgba(108,60,225,0.15)] border border-white/5">
+            <div className="overflow-hidden touch-pan-y cursor-grab active:cursor-grabbing" ref={emblaRef}>
+              <div className="flex">
+                {SLIDES.map((slide, index) => (
+                  <div className="flex-[0_0_100%] min-w-0 relative aspect-[16/10.5] flex items-center p-6" key={index}>
+                    <img src={slide.bg} className="absolute inset-0 w-full h-full object-cover opacity-90 z-0 scale-100 pointer-events-none" alt="" />
+                    <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/45 to-transparent z-1" />
 
-                    {/* Tombol Klik LIHAT > */}
-                    <button onClick={() => triggerToast(`Membuka promo: ${banner.title}`, 'fa-layer-group')} className="self-start bg-gradient-to-r from-[#00bfa5] to-[#00e676] text-[#1a1a2e] font-extrabold text-[12px] tracking-wide px-5 py-2 rounded-xl shadow-[0_4px_15px_rgba(0,191,165,0.4)] active:scale-95 transition-all flex items-center gap-2 border-none cursor-pointer">
-                      LIHAT <i className="fas fa-chevron-right text-[10px]"></i>
-                    </button>
-
+                    <div className="relative z-10 w-full">
+                      {/* 1. Badge Kategori */}
+                      <div className={`transition-all duration-700 delay-300 ${selectedIndex === index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                        <div className="inline-flex items-center gap-1.5 bg-[#00bfa5]/10 border border-[#00bfa5]/30 rounded-lg px-3 py-[3px] mb-2.5">
+                          <i className="fas fa-bolt text-[9px] text-[#00e676] drop-shadow-[0_0_5px_#00e676]"></i>
+                          <span className="text-[10px] text-[#00e676] font-bold uppercase tracking-widest italic">{slide.category}</span>
+                        </div>
+                      </div>
+                      
+                      {/* 2. Judul Slider */}
+                      <h3 className={`text-[26px] font-black text-white mb-1 italic tracking-tight uppercase leading-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)] transition-all duration-700 delay-500 ${selectedIndex === index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                        {slide.title}
+                      </h3>
+                      
+                      {/* 3. Teks Deskripsi */}
+                      <p className={`text-zinc-200 text-[12px] mb-5 max-w-[80%] italic font-light leading-relaxed line-clamp-2 transition-all duration-700 delay-700 ${selectedIndex === index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                        {slide.desc}
+                      </p>
+                      
+                      {/* 4. Tombol Aksi */}
+                      <div className={`transition-all duration-700 delay-1000 ${selectedIndex === index ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}>
+                        <button 
+                          onClick={() => triggerToast(`Membuka promo: ${slide.category}`, 'fa-layer-group')}
+                          className="inline-flex items-center gap-2 bg-gradient-to-r from-[#00bfa5] to-[#00e676] text-[#1a1a2e] px-5 py-2 rounded-xl font-extrabold text-[12px] tracking-wide shadow-[0_4px_15px_rgba(0,191,165,0.4)] active:scale-95 transition-all border-none cursor-pointer"
+                        >
+                          LIHAT <i className="fas fa-chevron-right text-[10px]"></i>
+                        </button>
+                      </div>
+                    </div>
                   </div>
-                </div>
-              ))}
+                ))}
+              </div>
             </div>
-            
-            {/* INDIKATOR SLIDER MODEL KAPSUL LONJONG GLOW */}
-            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
-              {BANNERS.map((_, idx) => (
-                <button 
-                  key={idx} 
-                  onClick={() => setCurrentSlide(idx)} 
-                  className={`transition-all duration-300 border-none p-0 cursor-pointer h-[6px] rounded-full ${idx === currentSlide ? 'w-[22px] bg-[#00e676] shadow-[0_0_10px_rgba(0,230,118,0.6)]' : 'w-[6px] bg-white/40'}`} 
+
+            {/* --- FLUID CAPSULE PAGINATION DOTS --- */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-20">
+              {SLIDES.map((_, index) => (
+                <button
+                  key={index}
+                  onClick={() => scrollTo(index)}
+                  className="border-none p-0 cursor-pointer h-[6px] rounded-full transition-all duration-300 focus:outline-none"
+                  style={{
+                    width: selectedIndex === index ? "22px" : "6px",
+                    backgroundColor: selectedIndex === index ? "#00e676" : "rgba(255, 255, 255, 0.4)",
+                    boxShadow: selectedIndex === index ? "0 0 10px rgba(0,230,118,0.6)" : "none"
+                  }}
                 />
               ))}
+            </div>
+          </div>
+
+          {/* --- AREA STATISTIK TOKO (3 KOLOM PREMIUM) --- */}
+          <div className="grid grid-cols-3 gap-2 mt-[12px]">
+            <div className="bg-white rounded-xl py-2.5 text-center flex flex-col items-center justify-center min-h-[64px] shadow-[0_4px_14px_rgba(108,60,225,0.04)] border border-[#6c3ce1]/5">
+              <i className="fas fa-users text-[#6C3CE1] text-[15px] mb-0.5"></i>
+              <div className="text-[16px] font-black text-[#1a1a2e] leading-none italic">5000+</div>
+              <div className="text-[8px] text-[#8a8aa8] font-bold uppercase mt-1 tracking-wide">Pengguna</div>
+            </div>
+            <div className="bg-white rounded-xl py-2.5 text-center flex flex-col items-center justify-center min-h-[64px] shadow-[0_4px_14px_rgba(108,60,225,0.04)] border border-[#6c3ce1]/5">
+              <i className="fas fa-bolt text-[#f59e0b] text-[15px] mb-0.5"></i>
+              <div className="text-[16px] font-black text-[#1a1a2e] leading-none italic">99.9%</div>
+              <div className="text-[8px] text-[#8a8aa8] font-bold uppercase mt-1 tracking-wide">Uptime</div>
+            </div>
+            <div className="bg-white rounded-xl py-2.5 text-center flex flex-col items-center justify-center min-h-[64px] shadow-[0_4px_14px_rgba(108,60,225,0.04)] border border-[#6c3ce1]/5">
+              <i className="fas fa-shield-alt text-[#10b981] text-[15px] mb-0.5"></i>
+              <div className="text-[16px] font-black text-[#1a1a2e] leading-none italic">24/7</div>
+              <div className="text-[8px] text-[#8a8aa8] font-bold uppercase mt-1 tracking-wide">Support</div>
             </div>
           </div>
 
@@ -305,3 +358,4 @@ export default function Home() {
     </div>
   );
 }
+    
