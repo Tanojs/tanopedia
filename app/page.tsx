@@ -3,6 +3,7 @@
 import { useState, useEffect, useRef } from 'react';
 import { Product } from './types';
 
+// 1. DATA PRODUK TOKO
 const DATA_PRODUCTS: Product[] = [
   { id: '1', name: 'Alight Motion', category: 'design', desc: 'Premium Editing', price: 39900, originalPrice: 65000, image: 'https://picsum.photos/seed/alightmotion/400/200', isHot: true, isAuto: true, icon: 'fa-layer-group' },
   { id: '2', name: 'CapCut Pro', category: 'design', desc: 'Harga Termurah', price: 29900, originalPrice: 55000, image: 'https://picsum.photos/seed/capcutpro/400/200', isHot: true, isBest: true, icon: 'fa-video' },
@@ -10,27 +11,32 @@ const DATA_PRODUCTS: Product[] = [
   { id: '4', name: 'Netflix Premium', category: 'stream', desc: 'Ultra HD · 4K', price: 69900, originalPrice: 120000, image: 'https://picsum.photos/seed/netflix/400/200', isHot: true, icon: 'fa-film' },
 ];
 
+// 2. DATA BANNER PROMO (Bisa kamu sesuaikan teksnya sesuka hati)
 const BANNERS = [
-  { tag: 'FLASH SALE', title: 'Diskon 50%', desc: 'Untuk semua aplikasi premium', img: 'https://picsum.photos/seed/banner1/1200/400' },
-  { tag: 'HARGA DISTRIBUTOR', title: 'Mulai Rp19.900', desc: 'CapCut Pro, Alight Motion & banyak lagi', img: 'https://picsum.photos/seed/banner2/1200/400' },
-  { tag: 'GARANSI 30 HARI', title: 'Premium Terpercaya', desc: 'Otomatis, cepat, dan bergaransi', img: 'https://picsum.photos/seed/banner3/1200/400' },
+  { tag: 'SOURCE CODE', title: 'SC BOT', desc: 'Source code premium dengan fitur lengkap, ringan, aman, dan mudah digunakan.', img: 'https://picsum.photos/seed/banner1/1200/800' },
+  { tag: 'FLASH SALE', title: 'DISKON 50%', desc: 'Akses instan aplikasi premium tanpa batas untuk kebutuhan harianmu.', img: 'https://picsum.photos/seed/banner2/1200/800' },
+  { tag: 'DISTRIBUTOR', title: 'HARGA TERMURAH', desc: 'Layanan otomatis 24 jam dengan garansi penuh selama 30 hari kalender.', img: 'https://picsum.photos/seed/banner3/1200/800' },
 ];
 
 export default function Home() {
+  // ---- STATE MANAGEMENT ----
   const [activePage, setActivePage] = useState<'home' | 'history' | 'profile'>('home');
   const [search, setSearch] = useState('');
   const [category, setCategory] = useState<'all' | 'design' | 'stream'>('all');
   const [invoice, setInvoice] = useState('');
   const [toast, setToast] = useState({ show: false, msg: '', icon: 'fa-check-circle' });
   
+  // Slider Carousel State
   const [currentSlide, setCurrentSlide] = useState(0);
   const carouselInterval = useRef<NodeJS.Timeout | null>(null);
 
+  // ---- TOAST NOTIFICATION LOGIC ----
   const triggerToast = (msg: string, icon: string = 'fa-check-circle') => {
     setToast({ show: true, msg, icon });
     setTimeout(() => setToast((prev) => ({ ...prev, show: false })), 2800);
   };
 
+  // ---- AUTOMATIC CAROUSEL SLIDER ----
   const startAutoPlay = () => {
     stopAutoPlay();
     carouselInterval.current = setInterval(() => {
@@ -47,6 +53,7 @@ export default function Home() {
     return () => stopAutoPlay();
   }, [currentSlide]);
 
+  // ---- REAL-TIME SEARCH & FILTER FILTERING ----
   const filteredProducts = DATA_PRODUCTS.filter((p) => {
     const matchCategory = category === 'all' || p.category === category;
     const matchSearch = p.name.toLowerCase().includes(search.toLowerCase().trim());
@@ -56,20 +63,20 @@ export default function Home() {
   return (
     <div className="max-w-[480px] mx-auto px-4 pt-[18px]">
       
-      {/* ====== TOAST ====== */}
+      {/* ====== PEMBERITAHUAN TOAST POPUP ====== */}
       <div className={`fixed bottom-[90px] left-1/2 -translate-x-1/2 bg-[#1a1a2e] text-white px-6 py-3 rounded-2xl text-[13px] font-semibold shadow-2xl transition-all duration-350 z-[200] flex items-center gap-2 max-w-[90%] pointer-events-none ${toast.show ? 'opacity-100 translate-y-0 visible' : 'opacity-0 translate-y-5 invisible'}`}>
         <i className={`fas ${toast.icon}`}></i>
         <span>{toast.msg}</span>
       </div>
 
-      {/* ==================== HOME PAGE ==================== */}
+      {/* ==================== 1. HALAMAN UTAMA (HOME) ==================== */}
       {activePage === 'home' && (
         <div>
-          {/* HEADER */}
+          {/* HEADER UTAMA */}
           <header className="mb-[10px]">
             <div className="flex items-center justify-between">
               <div className="flex items-center gap-3">
-                <div className="w-11 h-11 rounded-[14px] bg-gradient-to-br from-[#6C3CE1] to-[#a855f7] flex items-center justify-center text-white text-ea shadow-[0_4px_12px_rgba(108,60,225,0.3)]">
+                <div className="w-11 h-11 rounded-[14px] bg-gradient-to-br from-[#6C3CE1] to-[#a855f7] flex items-center justify-center text-white shadow-[0_4px_12px_rgba(108,60,225,0.3)]">
                   <i className="fas fa-crown text-[20px]"></i>
                 </div>
                 <div>
@@ -86,68 +93,59 @@ export default function Home() {
             </p>
           </header>
 
-                      {/* CAROUSEL BANNER - Sekarang Persegi Panjang Proporsional */}
-            <div 
-              className="relative w-full rounded-[20px] overflow-hidden mt-2 bg-[#1a1a2e] shadow-[0_8px_28px_rgba(108,60,225,0.1)]"
-              onMouseEnter={stopAutoPlay}
-              onMouseLeave={startAutoPlay}
-            >
-              <div className="flex transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-                            {/* CAROUSEL BANNER - Mengikuti Desain Gambar 353f0bab-7c5a-4f19-8ab0-82b5323cdb5c */}
-            <div 
-              className="relative w-full rounded-[24px] overflow-hidden mt-2 bg-[#1a1a2e] shadow-[0_8px_30px_rgba(108,60,225,0.15)] border border-white/5"
-              onMouseEnter={stopAutoPlay}
-              onMouseLeave={startAutoPlay}
-            >
-              <div className="flex transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
-                {BANNERS.map((banner, index) => (
-                  <div key={index} className="min-w-full relative aspect-[16/10.5] shrink-0 overflow-hidden">
-                    {/* Gambar Background Banner */}
-                    <img src={banner.img} alt={banner.title} className="w-full h-full object-cover pointer-events-none" />
+          {/* ====== CAROUSEL BANNER PREMIUM (GAYA GLOING CYBERPUNK) ====== */}
+          <div 
+            className="relative w-full rounded-[24px] overflow-hidden mt-2 bg-[#1a1a2e] shadow-[0_8px_30px_rgba(108,60,225,0.15)] border border-white/5"
+            onMouseEnter={stopAutoPlay}
+            onMouseLeave={startAutoPlay}
+          >
+            <div className="flex transition-transform duration-500 ease-[cubic-bezier(0.25,0.46,0.45,0.94)]" style={{ transform: `translateX(-${currentSlide * 100}%)` }}>
+              {BANNERS.map((banner, index) => (
+                <div key={index} className="min-w-full relative aspect-[16/10.5] shrink-0 overflow-hidden">
+                  {/* Gambar Latar Belakang */}
+                  <img src={banner.img} alt={banner.title} className="w-full h-full object-cover pointer-events-none" />
+                  
+                  {/* Gradasi Overlay Gelap & Penataan Konten */}
+                  <div className="absolute inset-0 bg-gradient-to-r from-black/85 via-black/40 to-transparent flex flex-col justify-center p-6 text-white">
                     
-                    {/* Overlay Gelap & Penataan Teks Kiri */}
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/80 via-black/40 to-transparent flex flex-col justify-center p-6 text-white">
-                      
-                      {/* Tag Kategori Atas dengan Ikon Petir */}
-                      <span className="self-start text-[10px] font-bold tracking-[0.5px] bg-[#00bfa5]/10 text-[#00e676] border border-[#00bfa5]/30 px-3 py-[3px] rounded-lg mb-2.5 flex items-center gap-1 uppercase">
-                        <i className="fas fa-bolt text-[9px]"></i> {banner.tag}
-                      </span>
-                      
-                      {/* Judul Utama Miring (Italic Bold) */}
-                      <h3 className="text-[26px] font-black italic tracking-tight mb-1 bg-gradient-to-r from-white via-white to-gray-350 bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
-                        {banner.title}
-                      </h3>
-                      
-                      {/* Deskripsi Teks */}
-                      <p className="text-[12px] opacity-80 font-medium max-w-[75%] leading-relaxed mb-5 drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
-                        {banner.desc}
-                      </p>
+                    {/* Badge Indikator Atas dengan Ikon Petir */}
+                    <span className="self-start text-[10px] font-bold tracking-[0.5px] bg-[#00bfa5]/10 text-[#00e676] border border-[#00bfa5]/30 px-3 py-[3px] rounded-lg mb-2.5 flex items-center gap-1 uppercase">
+                      <i className="fas fa-bolt text-[9px]"></i> {banner.tag}
+                    </span>
+                    
+                    {/* Judul Cetak Miring Tebal (Italic Black) */}
+                    <h3 className="text-[26px] font-black italic tracking-tight mb-1 bg-gradient-to-r from-white via-white to-gray-300 bg-clip-text text-transparent drop-shadow-[0_2px_8px_rgba(0,0,0,0.5)]">
+                      {banner.title}
+                    </h3>
+                    
+                    {/* Teks Sub-deskripsi */}
+                    <p className="text-[12px] opacity-80 font-medium max-w-[75%] leading-relaxed mb-5 drop-shadow-[0_1px_4px_rgba(0,0,0,0.4)]">
+                      {banner.desc}
+                    </p>
 
-                      {/* Tombol LIHAT > */}
-                      <button className="self-start bg-gradient-to-r from-[#00bfa5] to-[#00e676] text-[#1a1a2e] font-extrabold text-[12px] tracking-wide px-5 py-2 rounded-xl shadow-[0_4px_15px_rgba(0,191,165,0.4)] active:scale-95 transition-all flex items-center gap-2 border-none cursor-pointer">
-                        LIHAT <i className="fas fa-chevron-right text-[10px]"></i>
-                      </button>
+                    {/* Tombol Klik LIHAT > */}
+                    <button onClick={() => triggerToast(`Membuka promo: ${banner.title}`, 'fa-layer-group')} className="self-start bg-gradient-to-r from-[#00bfa5] to-[#00e676] text-[#1a1a2e] font-extrabold text-[12px] tracking-wide px-5 py-2 rounded-xl shadow-[0_4px_15px_rgba(0,191,165,0.4)] active:scale-95 transition-all flex items-center gap-2 border-none cursor-pointer">
+                      LIHAT <i className="fas fa-chevron-right text-[10px]"></i>
+                    </button>
 
-                    </div>
                   </div>
-                ))}
-              </div>
-              
-              {/* INDIKATOR DOTS KAPSUL (Capsule Glow Slider) */}
-              <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
-                {BANNERS.map((_, idx) => (
-                  <button 
-                    key={idx} 
-                    onClick={() => setCurrentSlide(idx)} 
-                    className={`transition-all duration-300 border-none p-0 cursor-pointer h-[6px] rounded-full ${idx === currentSlide ? 'w-[22px] bg-[#00e676] shadow-[0_0_10px_rgba(0,230,118,0.6)]' : 'w-[6px] bg-white/40'}`} 
-                  />
-                ))}
-              </div>
+                </div>
+              ))}
             </div>
+            
+            {/* INDIKATOR SLIDER MODEL KAPSUL LONJONG GLOW */}
+            <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
+              {BANNERS.map((_, idx) => (
+                <button 
+                  key={idx} 
+                  onClick={() => setCurrentSlide(idx)} 
+                  className={`transition-all duration-300 border-none p-0 cursor-pointer h-[6px] rounded-full ${idx === currentSlide ? 'w-[22px] bg-[#00e676] shadow-[0_0_10px_rgba(0,230,118,0.6)]' : 'w-[6px] bg-white/40'}`} 
+                />
+              ))}
+            </div>
+          </div>
 
-          
-
-          {/* SEARCH & INVOICE */}
+          {/* SEARCH BAR & CEK INVOICE */}
           <div className="bg-white rounded-[20px] p-[16px_18px] mt-3.5 shadow-[0_8px_28px_rgba(108,60,225,0.1)] border border-[#6c3ce1]/5 flex flex-col gap-3">
             <div className="flex items-center gap-2.5 bg-[#f3f0fa] rounded-xl px-3.5 border-2 border-transparent focus-within:border-[#6C3CE1] focus-within:bg-white focus-within:shadow-[0_0_0_4px_rgba(108,60,225,0.08)] transition-all">
               <i className="fas fa-search text-gray-400 text-[15px]"></i>
@@ -182,14 +180,14 @@ export default function Home() {
             </div>
           </div>
 
-          {/* KATEGORI TABS */}
+          {/* MENU KATEGORI TABS */}
           <div className="flex gap-2 mt-5 overflow-x-auto pb-[10px] no-scrollbar">
             <button onClick={() => { setCategory('all'); triggerToast('Menampilkan: Semua', 'fa-filter'); }} className={`shrink-0 px-5 py-2.5 rounded-full text-[13px] font-semibold border border-[#6c3ce1]/5 transition-all cursor-pointer ${category === 'all' ? 'bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white shadow-[0_4px_18px_rgba(108,60,225,0.35)] border-transparent' : 'bg-white text-[#4a4a6a]'}`}><i className="fas fa-th-large mr-1.5"></i> Semua</button>
             <button onClick={() => { setCategory('design'); triggerToast('Menampilkan: Design & Edit', 'fa-filter'); }} className={`shrink-0 px-5 py-2.5 rounded-full text-[13px] font-semibold border border-[#6c3ce1]/5 transition-all cursor-pointer ${category === 'design' ? 'bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white shadow-[0_4px_18px_rgba(108,60,225,0.35)] border-transparent' : 'bg-white text-[#4a4a6a]'}`}><i className="fas fa-pen-fancy mr-1.5"></i> Design & Edit</button>
             <button onClick={() => { setCategory('stream'); triggerToast('Menampilkan: Stream & Media', 'fa-filter'); }} className={`shrink-0 px-5 py-2.5 rounded-full text-[13px] font-semibold border border-[#6c3ce1]/5 transition-all cursor-pointer ${category === 'stream' ? 'bg-gradient-to-r from-[#6C3CE1] to-[#a855f7] text-white shadow-[0_4px_18px_rgba(108,60,225,0.35)] border-transparent' : 'bg-white text-[#4a4a6a]'}`}><i className="fas fa-play-circle mr-1.5"></i> Stream & Media</button>
           </div>
 
-          {/* GRID PRODUK */}
+          {/* TAMPILAN GRID PRODUK */}
           <div className="grid grid-cols-2 gap-3.5 mt-2">
             {filteredProducts.map((p) => (
               <div key={p.id} onClick={() => triggerToast(`Detail produk: ${p.name}`, 'fa-info-circle')} className="bg-white rounded-[20px] p-[14px_14px_18px] shadow-[0_8px_28px_rgba(108,60,225,0.1)] border border-[#6c3ce1]/5 relative flex flex-col cursor-pointer hover:-translate-y-1 active:scale-[0.97] transition-all group">
@@ -226,7 +224,7 @@ export default function Home() {
             ))}
           </div>
 
-          {/* AKTIVITAS TERBARU */}
+          {/* KOMPONEN AKTIVITAS TERBARU RE-SELLER */}
           <div className="mt-6">
             <div className="flex justify-between items-center mb-3">
               <h3 className="text-[16px] font-bold"><i className="fas fa-clock text-[#6C3CE1] mr-1.5"></i> Aktivitas Terbaru</h3>
@@ -247,7 +245,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* ==================== RIWAYAT TRANSAKSI ==================== */}
+      {/* ==================== 2. HALAMAN HISTORY TRANSAKSI ==================== */}
       {activePage === 'history' && (
         <div className="text-center p-[40px_16px_20px]">
           <div className="text-[64px] text-[#8b6bf0] opacity-30 mb-4"><i className="fas fa-history"></i></div>
@@ -269,7 +267,7 @@ export default function Home() {
         </div>
       )}
 
-      {/* ==================== PROFIL SAYA ==================== */}
+      {/* ==================== 3. HALAMAN USER PROFILE ==================== */}
       {activePage === 'profile' && (
         <div className="text-center p-[40px_16px_20px]">
           <div className="text-[64px] text-[#8b6bf0] opacity-30 mb-4"><i className="fas fa-user-circle"></i></div>
@@ -285,25 +283,5 @@ export default function Home() {
         </div>
       )}
 
-      {/* ====== BOTTOM NAVIGATION ====== */}
-      <nav className="fixed bottom-0 left-0 right-0 max-w-[480px] mx-auto bg-white/88 backdrop-blur-[16px] border-t border-[#6c3ce1]/6 flex justify-around items-center h-[70px] pb-2 shadow-[0_-4px_20px_rgba(108,60,225,0.06)] z-[100] rounded-t-[24px]">
-        <button onClick={() => setActivePage('home')} className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-2xl min-w-[64px] relative active:scale-[0.92] transition-all cursor-pointer ${activePage === 'home' ? 'text-[#6C3CE1] font-bold' : 'text-[#8a8aa8]'}`}>
-          <i className="fas fa-home text-[22px] transition-all"></i>
-          <span className="text-[10px] font-semibold transition-all">Home</span>
-          {activePage === 'home' && <div className="absolute top-[-1px] left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-full bg-gradient-to-r from-[#6C3CE1] to-[#a855f7]" />}
-        </button>
-        <button onClick={() => { setActivePage('history'); triggerToast('Menampilkan riwayat transaksi', 'fa-clock-rotate-left'); }} className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-2xl min-w-[64px] relative active:scale-[0.92] transition-all cursor-pointer ${activePage === 'history' ? 'text-[#6C3CE1] font-bold' : 'text-[#8a8aa8]'}`}>
-          <i className="fas fa-clock-rotate-left text-[22px] transition-all"></i>
-          <span className="text-[10px] font-semibold transition-all">History</span>
-          {activePage === 'history' && <div className="absolute top-[-1px] left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-full bg-gradient-to-r from-[#6C3CE1] to-[#a855f7]" />}
-        </button>
-        <button onClick={() => { setActivePage('profile'); triggerToast('Profil Anda', 'fa-user'); }} className={`flex flex-col items-center gap-0.5 px-4 py-1.5 rounded-2xl min-w-[64px] relative active:scale-[0.92] transition-all cursor-pointer ${activePage === 'profile' ? 'text-[#6C3CE1] font-bold' : 'text-[#8a8aa8]'}`}>
-          <i className="fas fa-user text-[22px] transition-all"></i>
-          <span className="text-[10px] font-semibold transition-all">Profile</span>
-          {activePage === 'profile' && <div className="absolute top-[-1px] left-1/2 -translate-x-1/2 w-6 h-[3px] rounded-full bg-gradient-to-r from-[#6C3CE1] to-[#a855f7]" />}
-        </button>
-      </nav>
-
-    </div>
-  );
-}
+      {/* ====== BOTTOM NAVIGATION TABS ====== */}
+      <nav
